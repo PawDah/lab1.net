@@ -17,12 +17,12 @@
                     <form asp-action="Create">
                         @Html.AntiForgeryToken()
                         <div class="form-group mb-3">
-                            <label asp-for="Description" class="form-label">Opis</label>
+                            <label asp-for="Description" class="form-label">Nazwa</label>
                             <input asp-for="Description" class="form-control" />
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                         <div class="form-group mb-3">
-                            <input type="submit" value="Utwórz" class="btn btn-primary-custom w-100" />
+                            <input type="submit" value="Utwórz" class="btn btn-primary w-100" />
                         </div>
                     </form>
                 </div>
@@ -32,7 +32,7 @@
 
     <div class="row mt-4">
         <div class="col-md-12 text-center">
-            <a asp-action="Index" class="btn btn-secondary-custom">Cofnij</a>
+            <a asp-action="Index" class="btn btn-secondary">Cofnij</a>
         </div>
     </div>
 </div>

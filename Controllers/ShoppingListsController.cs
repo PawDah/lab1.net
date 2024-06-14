@@ -25,6 +25,8 @@ namespace lab1.net.Controllers
             var shoppingLists = await _context.ShoppingList
         .Include(s => s.ShoppingItems)
         .ToListAsync(); // Upewnij się, że używasz await tutaj
+            var allItems = await _context.ShoppingItem.ToListAsync();
+            ViewBag.AllItems = allItems;
             return View(shoppingLists);
         }
         public IActionResult Create()
@@ -33,30 +35,43 @@ namespace lab1.net.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title")] ShoppingList shoppingList)
+        public async Task<IActionResult> Create([Bind("Id,Title,Planned")] ShoppingList shoppingList)
         {
-            if (ModelState.IsValid)
+
+            if(shoppingList.Planned.Date>= DateTime.Now.Date)
             {
-                _context.Add(shoppingList);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+              
+                    _context.Add(shoppingList);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(shoppingList);
             }
+          
             return View(shoppingList);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddItem(int shoppingListId, string description)
+        public async Task<IActionResult> AddItem(int shoppingListId, int selectedItemId)
         {
-            if (!string.IsNullOrEmpty(description))
+            if (selectedItemId > 0)
             {
-                var shoppingItem = new ShoppingItem
+                var shoppingList = await _context.ShoppingList
+                    .Include(s => s.ShoppingItems)
+                    .FirstOrDefaultAsync(s => s.Id == shoppingListId);
+
+                if (shoppingList != null)
                 {
-                    Description = description,
-                    ShoppingListId = shoppingListId
-                };
-                _context.Add(shoppingItem);
-                await _context.SaveChangesAsync();
+                    var shoppingItem = await _context.ShoppingItem.FirstOrDefaultAsync(i => i.Id == selectedItemId);
+                    if (shoppingItem != null && !shoppingList.ShoppingItems.Contains(shoppingItem))
+                    {
+                        shoppingList.ShoppingItems.Add(shoppingItem);
+                        await _context.SaveChangesAsync();
+                    }
+                }
             }
             return RedirectToAction(nameof(Index));
         }
@@ -96,19 +111,26 @@ namespace lab1.net.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult DeleteItem(int id)
+        public async Task<IActionResult> DeleteItem(int id, int shoppingListId)
         {
-            var obj = _context.ShoppingItem.FirstOrDefault(c => c.Id == id);
-            if (obj == null)
+            var shoppingList = await _context.ShoppingList
+                .Include(s => s.ShoppingItems)
+                .FirstOrDefaultAsync(s => s.Id == shoppingListId);
+
+            if (shoppingList == null)
             {
-                ModelState.AddModelError("Name", "A category with the same name already exists.");
+                return NotFound();
             }
-            if (ModelState.IsValid)
+
+            var shoppingItem = shoppingList.ShoppingItems.FirstOrDefault(i => i.Id == id);
+            if (shoppingItem == null)
             {
-                _context.ShoppingItem.Remove(obj);
-                _context.SaveChangesAsync();
-                return RedirectToAction("Index");
+                return NotFound();
             }
+
+            shoppingList.ShoppingItems.Remove(shoppingItem);
+            await _context.SaveChangesAsync();
+
             return RedirectToAction("Index");
         }
 

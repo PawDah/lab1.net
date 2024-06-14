@@ -28,12 +28,15 @@
                             @if (list.ShoppingItems.All(i => i.IsChecked))
                             {
                                 <span class="text-decoration-line-through">@list.Title</span>
+                                <p>Zaplanowano na dzień @list.Planned.ToString("dd/MM/yyyy")</p>
                             }
                             else
                             {
                                 @list.Title
+                                <p>Zaplanowano na dzień @list.Planned.ToString("dd/MM/yyyy")</p>
                             }
                         </h5>
+
                         <ul class="list-group list-group-flush">
                             @foreach (var item in list.ShoppingItems)
                             {
@@ -70,7 +73,13 @@
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="shoppingListId" value="@list.Id" />
                             <div class="input-group">
-                                <input type="text" name="description" class="form-control" placeholder="Dodaj nowy przedmiot" />
+                                <select class="form-control" name="selectedItemId">
+                                    <option value="">Wybierz przedmiot</option>
+                                    @foreach (var item in ViewBag.AllItems)
+                                    {
+                                        <option value="@item.Id">@item.Description</option>
+                                    }
+                                </select>
                                 <button type="submit" class="btn btn-custom"><i class="bi bi-plus-lg"></i></button>
                             </div>
                         </form>

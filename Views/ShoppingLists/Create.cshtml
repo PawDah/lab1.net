@@ -23,7 +23,12 @@
                             <span asp-validation-for="Title" class="text-danger"></span>
                         </div>
                         <div class="form-group mb-3">
-                            <input type="submit" value="Utwórz" class="btn btn-primary-custom w-100" />
+                            <label asp-for="Planned" class="form-label">Data zaplanowanych zakupów</label>
+                            <input type="date" asp-for="Planned" class="form-control" />
+                            <span asp-validation-for="Planned" class="text-danger"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <input type="submit" value="Utwórz" class="btn btn-primary w-100" />
                         </div>
                     </form>
                 </div>
@@ -33,7 +38,7 @@
 
     <div class="row mt-4">
         <div class="col-md-12 text-center">
-            <a asp-action="Index" class="btn btn-secondary-custom">Cofnij</a>
+            <a asp-action="Index" class="btn btn-secondary">Cofnij</a>
         </div>
     </div>
 </div>
